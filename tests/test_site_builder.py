@@ -29,6 +29,7 @@ class TestSiteBuilder(unittest.TestCase):
             self.assertIn("yearly_stats", saved)
             self.assertIn("books", saved)
             self.assertIn("timeline", saved)
+            self.assertIn("monthly_stats", saved)
             self.assertEqual(len(saved["books"]), 10)
             self.assertEqual(saved["kpis"]["total_finished_books"], 9)
 
@@ -59,6 +60,10 @@ class TestSiteBuilder(unittest.TestCase):
         self.assertIn('id="theme-toggle"', html)
         self.assertIn('id="reading-books-list"', html)
         self.assertIn('id="yearly-sections-container"', html)
+        self.assertIn('id="cumulativeChart"', html)
+        self.assertIn('id="monthlyChart"', html)
+        self.assertIn('id="genreChart"', html)
+        self.assertIn('id="formatChart"', html)
 
 
 if __name__ == "__main__":

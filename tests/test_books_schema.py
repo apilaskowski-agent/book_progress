@@ -6,7 +6,12 @@ import os
 import unittest
 from datetime import date
 from src.models import Book
-from src.analyzer import load_books, compute_reading_stats, compute_daily_reading_spread
+from src.analyzer import (
+    load_books,
+    compute_reading_stats,
+    compute_daily_reading_spread,
+    compute_monthly_reading_spread
+)
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DATA_PATH = os.path.join(REPO_ROOT, "data", "books.json")
@@ -89,6 +94,25 @@ class TestBooksSchema(unittest.TestCase):
         self.assertIn("date", first_point)
         self.assertGreater(last_point["cumulative_pages"], 2000)
         self.assertGreater(last_point["cumulative_audio_hours"], 50)
+
+    def test_monthly_reading_spread(self):
+        """Verify monthly aggregation for bar charts."""
+        books = load_books(DATA_PATH)
+        timeline = compute_daily_reading_spread(books)
+        monthly = compute_monthly_reading_spread(timeline, books)
+
+        self.assertGreater(len(monthly), 0)
+        months = [m["month"] for m in monthly]
+        self.assertIn("2024-01", months)
+        self.assertIn("2025-01", months)
+
+        total_monthly_pages = sum(m["pages"] for m in monthly)
+        total_monthly_audio = sum(m["audio_hours"] for m in monthly)
+
+        # Pages should closely match total 2327 pages
+        self.assertAlmostEqual(total_monthly_pages, 2327, delta=5)
+        # Audio hours should closely match ~64.3 hours
+        self.assertAlmostEqual(total_monthly_audio, 64.3, delta=1.0)
 
 
 if __name__ == "__main__":

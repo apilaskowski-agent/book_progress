@@ -150,3 +150,55 @@ def compute_daily_reading_spread(books: List[Book]) -> List[Dict[str, Any]]:
         })
 
     return timeline
+
+
+def compute_monthly_reading_spread(timeline: List[Dict[str, Any]], books: List[Book]) -> List[Dict[str, Any]]:
+    """
+    Aggregate daily spread points into continuous monthly buckets for bar charts.
+    """
+    monthly_pages = defaultdict(float)
+    monthly_audio_min = defaultdict(float)
+    monthly_books_finished = defaultdict(int)
+
+    for pt in timeline:
+        month_key = pt["date"][:7] # YYYY-MM
+        monthly_pages[month_key] += pt["pages"]
+        monthly_audio_min[month_key] += pt["audio_minutes"]
+
+    for b in books:
+        if b.status == "finished" and b.end_date:
+            month_key = b.end_date[:7]
+            monthly_books_finished[month_key] += 1
+
+    all_months = sorted(set(list(monthly_pages.keys()) + list(monthly_audio_min.keys())))
+    if not all_months:
+        return []
+
+    # Fill intermediate months so charts don't have gaps
+    start_year, start_month = map(int, all_months[0].split("-"))
+    end_year, end_month = map(int, all_months[-1].split("-"))
+
+    month_sequence = []
+    y, m = start_year, start_month
+    while (y < end_year) or (y == end_year and m <= end_month):
+        month_sequence.append(f"{y:04d}-{m:02d}")
+        m += 1
+        if m > 12:
+            m = 1
+            y += 1
+
+    result = []
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+    for m_key in month_sequence:
+        yr, mn = m_key.split("-")
+        label = f"{month_names[int(mn)-1]} '{yr[2:]}"
+        result.append({
+            "month": m_key,
+            "label": label,
+            "pages": round(monthly_pages[m_key]),
+            "audio_hours": round(monthly_audio_min[m_key] / 60.0, 1),
+            "books_finished": monthly_books_finished[m_key]
+        })
+
+    return result
