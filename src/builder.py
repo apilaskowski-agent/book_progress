@@ -1,0 +1,46 @@
+"""
+Static site generator for book_progress.
+Compiles data and prepares the docs/ directory for GitHub Pages.
+"""
+
+import json
+import os
+import shutil
+from .analyzer import load_books, compute_reading_stats, compute_daily_reading_spread
+from .models import Book
+
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DATA_PATH = os.path.join(REPO_ROOT, "data", "books.json")
+DOCS_DIR = os.path.join(REPO_ROOT, "docs")
+
+
+def build(output_dir: str = DOCS_DIR, data_path: str = DATA_PATH):
+    """Compile dataset, analytics, and static assets into output_dir."""
+    os.makedirs(output_dir, exist_ok=True)
+
+    # 1. Load books and compute stats
+    books = load_books(data_path)
+    stats = compute_reading_stats(books)
+    timeline = compute_daily_reading_spread(books)
+
+    payload = {
+        "kpis": stats["kpis"],
+        "yearly_stats": stats["yearly_stats"],
+        "genre_counts": stats["genre_counts"],
+        "currently_reading": stats["currently_reading"],
+        "books": [b.to_dict() for b in books],
+        "timeline": timeline,
+        "built_at": "2026-11-26T01:30:00Z"
+    }
+
+    # 2. Write data.json into docs
+    data_dest = os.path.join(output_dir, "data.json")
+    with open(data_dest, "w", encoding="utf-8") as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
+    print(f"[INFO] Wrote pre-computed stats to {data_dest}")
+
+    return payload
+
+
+if __name__ == "__main__":
+    build()
