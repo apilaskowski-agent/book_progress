@@ -6,7 +6,12 @@ Compiles data and prepares the docs/ directory for GitHub Pages.
 import json
 import os
 import shutil
-from .analyzer import load_books, compute_reading_stats, compute_daily_reading_spread
+from .analyzer import (
+    load_books,
+    compute_reading_stats,
+    compute_daily_reading_spread,
+    compute_monthly_reading_spread
+)
 from .models import Book
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -22,6 +27,7 @@ def build(output_dir: str = DOCS_DIR, data_path: str = DATA_PATH):
     books = load_books(data_path)
     stats = compute_reading_stats(books)
     timeline = compute_daily_reading_spread(books)
+    monthly_stats = compute_monthly_reading_spread(timeline, books)
 
     payload = {
         "kpis": stats["kpis"],
@@ -30,6 +36,7 @@ def build(output_dir: str = DOCS_DIR, data_path: str = DATA_PATH):
         "currently_reading": stats["currently_reading"],
         "books": [b.to_dict() for b in books],
         "timeline": timeline,
+        "monthly_stats": monthly_stats,
         "built_at": "2026-11-26T01:30:00Z"
     }
 

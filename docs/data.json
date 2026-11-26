@@ -2407,5 +2407,154 @@
       "cumulative_audio_hours": 64.3
     }
   ],
+  "monthly_stats": [
+    {
+      "month": "2024-01",
+      "label": "Jan '24",
+      "pages": 0,
+      "audio_hours": 16.2,
+      "books_finished": 1
+    },
+    {
+      "month": "2024-02",
+      "label": "Feb '24",
+      "pages": 320,
+      "audio_hours": 0.0,
+      "books_finished": 1
+    },
+    {
+      "month": "2024-03",
+      "label": "Mar '24",
+      "pages": 689,
+      "audio_hours": 0.0,
+      "books_finished": 1
+    },
+    {
+      "month": "2024-04",
+      "label": "Apr '24",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2024-05",
+      "label": "May '24",
+      "pages": 0,
+      "audio_hours": 7.7,
+      "books_finished": 1
+    },
+    {
+      "month": "2024-06",
+      "label": "Jun '24",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2024-07",
+      "label": "Jul '24",
+      "pages": 313,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2024-08",
+      "label": "Aug '24",
+      "pages": 303,
+      "audio_hours": 0.0,
+      "books_finished": 1
+    },
+    {
+      "month": "2024-09",
+      "label": "Sep '24",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2024-10",
+      "label": "Oct '24",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2024-11",
+      "label": "Nov '24",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2024-12",
+      "label": "Dec '24",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2025-01",
+      "label": "Jan '25",
+      "pages": 326,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2025-02",
+      "label": "Feb '25",
+      "pages": 74,
+      "audio_hours": 0.0,
+      "books_finished": 1
+    },
+    {
+      "month": "2025-03",
+      "label": "Mar '25",
+      "pages": 0,
+      "audio_hours": 19.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2025-04",
+      "label": "Apr '25",
+      "pages": 0,
+      "audio_hours": 6.1,
+      "books_finished": 1
+    },
+    {
+      "month": "2025-05",
+      "label": "May '25",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2025-06",
+      "label": "Jun '25",
+      "pages": 302,
+      "audio_hours": 0.0,
+      "books_finished": 1
+    },
+    {
+      "month": "2025-07",
+      "label": "Jul '25",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2025-08",
+      "label": "Aug '25",
+      "pages": 0,
+      "audio_hours": 0.0,
+      "books_finished": 0
+    },
+    {
+      "month": "2025-09",
+      "label": "Sep '25",
+      "pages": 0,
+      "audio_hours": 15.3,
+      "books_finished": 1
+    }
+  ],
   "built_at": "2026-11-26T01:30:00Z"
 }

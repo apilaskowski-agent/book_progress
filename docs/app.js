@@ -4,7 +4,8 @@ let appState = {
   data: null,
   activeFilter: 'all',
   searchQuery: '',
-  theme: localStorage.getItem('theme') || 'dark'
+  theme: localStorage.getItem('theme') || 'dark',
+  charts: {}
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
 function initTheme() {
   document.documentElement.setAttribute('data-theme', appState.theme);
   updateThemeIcon();
+  if (appState.data) {
+    renderCharts();
+  }
 }
 
 function updateThemeIcon() {
@@ -74,6 +78,15 @@ function setupEventListeners() {
     const section = document.getElementById('currently-reading-section');
     section.classList.toggle('collapsed');
   });
+
+  // Charts accordion toggle
+  const chartsHeader = document.getElementById('heading-charts');
+  if (chartsHeader) {
+    chartsHeader.addEventListener('click', () => {
+      const section = document.getElementById('charts-section');
+      section.classList.toggle('collapsed');
+    });
+  }
 }
 
 // Render Core Dashboard
@@ -82,6 +95,7 @@ function renderDashboard() {
 
   renderKPIs();
   updateCounts();
+  renderCharts();
   renderBookLists();
 }
 
@@ -293,4 +307,303 @@ function formatDateRange(start, end) {
   if (!start && !end) return 'Not recorded';
   if (start && !end) return `Started ${start}`;
   return `${start} → ${end}`;
+}
+
+// Interactive Chart.js Implementations
+function getChartTheme() {
+  const isDark = appState.theme === 'dark';
+  return {
+    textColor: isDark ? '#94a3b8' : '#475569',
+    gridColor: isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)',
+    tooltipBg: isDark ? '#1e293b' : '#ffffff',
+    tooltipText: isDark ? '#f8fafc' : '#0f172a'
+  };
+}
+
+function renderCharts() {
+  if (typeof Chart === 'undefined' || !appState.data) return;
+
+  renderCumulativeChart();
+  renderMonthlyChart();
+  renderGenreChart();
+  renderFormatChart();
+}
+
+function renderCumulativeChart() {
+  const ctx = document.getElementById('cumulativeChart');
+  if (!ctx) return;
+
+  if (appState.charts.cumulative) {
+    appState.charts.cumulative.destroy();
+  }
+
+  const timeline = appState.data.timeline || [];
+  if (timeline.length === 0) return;
+
+  // Sample points if too dense (keep ~30-40 points for clear line)
+  const step = Math.max(1, Math.floor(timeline.length / 40));
+  const sampled = timeline.filter((_, idx) => idx % step === 0 || idx === timeline.length - 1);
+
+  const labels = sampled.map(p => p.date);
+  const pagesData = sampled.map(p => p.cumulative_pages);
+  const audioData = sampled.map(p => p.cumulative_audio_hours);
+
+  const theme = getChartTheme();
+
+  appState.charts.cumulative = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Cumulative Pages (Print/E-Book)',
+          data: pagesData,
+          borderColor: '#38bdf8',
+          backgroundColor: 'rgba(56, 189, 248, 0.1)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Cumulative Audio (Hours)',
+          data: audioData,
+          borderColor: '#a855f7',
+          backgroundColor: 'rgba(168, 85, 247, 0.1)',
+          fill: true,
+          tension: 0.3,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          labels: { color: theme.textColor, font: { size: 11, weight: '600' } }
+        },
+        tooltip: {
+          backgroundColor: theme.tooltipBg,
+          titleColor: theme.tooltipText,
+          bodyColor: theme.tooltipText,
+          borderColor: theme.gridColor,
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: theme.gridColor },
+          ticks: {
+            color: theme.textColor,
+            maxTicksLimit: 8,
+            font: { size: 10 }
+          }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          grid: { color: theme.gridColor },
+          ticks: { color: theme.textColor, font: { size: 10 } },
+          title: { display: true, text: 'Pages', color: '#38bdf8', font: { size: 11 } }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { color: theme.textColor, font: { size: 10 } },
+          title: { display: true, text: 'Hours', color: '#a855f7', font: { size: 11 } }
+        }
+      }
+    }
+  });
+}
+
+function renderMonthlyChart() {
+  const ctx = document.getElementById('monthlyChart');
+  if (!ctx) return;
+
+  if (appState.charts.monthly) {
+    appState.charts.monthly.destroy();
+  }
+
+  const monthlyStats = appState.data.monthly_stats || [];
+  if (monthlyStats.length === 0) return;
+
+  const labels = monthlyStats.map(m => m.label);
+  const pages = monthlyStats.map(m => m.pages);
+  const audioHours = monthlyStats.map(m => m.audio_hours);
+
+  const theme = getChartTheme();
+
+  appState.charts.monthly = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Pages Read',
+          data: pages,
+          backgroundColor: 'rgba(56, 189, 248, 0.85)',
+          borderRadius: 4,
+          yAxisID: 'y'
+        },
+        {
+          label: 'Audio Hours',
+          data: audioHours,
+          backgroundColor: 'rgba(168, 85, 247, 0.85)',
+          borderRadius: 4,
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      plugins: {
+        legend: {
+          labels: { color: theme.textColor, font: { size: 11, weight: '600' } }
+        },
+        tooltip: {
+          backgroundColor: theme.tooltipBg,
+          titleColor: theme.tooltipText,
+          bodyColor: theme.tooltipText,
+          borderColor: theme.gridColor,
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: theme.gridColor },
+          ticks: { color: theme.textColor, font: { size: 10 } }
+        },
+        y: {
+          type: 'linear',
+          display: true,
+          position: 'left',
+          grid: { color: theme.gridColor },
+          ticks: { color: theme.textColor, font: { size: 10 } },
+          title: { display: true, text: 'Pages', color: '#38bdf8', font: { size: 11 } }
+        },
+        y1: {
+          type: 'linear',
+          display: true,
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { color: theme.textColor, font: { size: 10 } },
+          title: { display: true, text: 'Hours', color: '#a855f7', font: { size: 11 } }
+        }
+      }
+    }
+  });
+}
+
+function renderGenreChart() {
+  const ctx = document.getElementById('genreChart');
+  if (!ctx) return;
+
+  if (appState.charts.genre) {
+    appState.charts.genre.destroy();
+  }
+
+  const genreCounts = (appState.data.genre_counts || []).slice(0, 6);
+  if (genreCounts.length === 0) return;
+
+  const labels = genreCounts.map(g => g.genre);
+  const data = genreCounts.map(g => g.count);
+
+  const theme = getChartTheme();
+  const palette = ['#38bdf8', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#6366f1'];
+
+  appState.charts.genre = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: palette,
+        borderColor: theme.tooltipBg,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: theme.textColor, boxWidth: 12, font: { size: 10 } }
+        },
+        tooltip: {
+          backgroundColor: theme.tooltipBg,
+          titleColor: theme.tooltipText,
+          bodyColor: theme.tooltipText,
+          borderColor: theme.gridColor,
+          borderWidth: 1
+        }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+function renderFormatChart() {
+  const ctx = document.getElementById('formatChart');
+  if (!ctx) return;
+
+  if (appState.charts.format) {
+    appState.charts.format.destroy();
+  }
+
+  const kpis = appState.data.kpis;
+  const labels = ['Print / E-Books', 'Audiobooks'];
+  const data = [kpis.total_print_books, kpis.total_audiobooks];
+
+  const theme = getChartTheme();
+
+  appState.charts.format = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: ['#10b981', '#a855f7'],
+        borderColor: theme.tooltipBg,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: { color: theme.textColor, boxWidth: 12, font: { size: 10 } }
+        },
+        tooltip: {
+          backgroundColor: theme.tooltipBg,
+          titleColor: theme.tooltipText,
+          bodyColor: theme.tooltipText,
+          borderColor: theme.gridColor,
+          borderWidth: 1
+        }
+      },
+      cutout: '65%'
+    }
+  });
 }

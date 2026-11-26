@@ -6,6 +6,7 @@
   <title>Book Progress | Reading & Audiobook Tracker</title>
   <meta name="description" content="Personal reading and audiobook analytics dashboard.">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -43,6 +44,59 @@
         <div class="kpi-label">Words Consumed</div>
         <div class="kpi-value" id="kpi-words">-</div>
         <div class="kpi-sub">Across All Formats</div>
+      </div>
+    </section>
+
+    <!-- Interactive Charts Section -->
+    <section class="accordion-section" id="charts-section">
+      <div class="accordion-header" id="heading-charts">
+        <div class="accordion-title-wrap">
+          <span class="chart-header-icon">📊</span>
+          <h2 class="accordion-title">Reading Velocity & Analytics</h2>
+          <span class="badge badge-accent">Interactive Plots</span>
+        </div>
+        <span class="accordion-toggle-icon">▼</span>
+      </div>
+      <div class="accordion-content charts-grid" id="charts-container-inner">
+        <div class="chart-card chart-card-wide">
+          <div class="chart-card-header">
+            <h3 class="chart-card-title">📈 Cumulative Growth Curve</h3>
+            <span class="chart-card-subtitle">Pages & audio hours progression over time</span>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="cumulativeChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card chart-card-wide">
+          <div class="chart-card-header">
+            <h3 class="chart-card-title">📊 Monthly Reading Volume</h3>
+            <span class="chart-card-subtitle">Uniform distribution across active reading dates</span>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3 class="chart-card-title">🏷️ Top Genres</h3>
+            <span class="chart-card-subtitle">Distribution by category</span>
+          </div>
+          <div class="canvas-wrapper canvas-donut">
+            <canvas id="genreChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3 class="chart-card-title">🎧 Format Split</h3>
+            <span class="chart-card-subtitle">Print / E-books vs Audiobooks</span>
+          </div>
+          <div class="canvas-wrapper canvas-donut">
+            <canvas id="formatChart"></canvas>
+          </div>
+        </div>
       </div>
     </section>
 
