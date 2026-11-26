@@ -39,12 +39,32 @@ A clean, personal reading and audiobook tracker with interactive statistics, hos
 │   ├── models.py              # Book data models & schema validation
 │   ├── analyzer.py            # Aggregations, pace, and timeline spread
 │   └── builder.py             # Static site compiler
+├── scripts/
+│   └── add_book.py            # CLI helper to fetch metadata & append book
 ├── tests/
 │   ├── test_books_schema.py   # Schema & math unit tests
-│   └── test_site_builder.py   # Build & asset verification tests
+│   ├── test_site_builder.py   # Build & asset verification tests
+│   └── test_add_book.py       # Metadata fetcher & CLI unit tests
 ├── build.py                   # Top-level build entrypoint
 ├── .gitignore
 └── README.md
+```
+
+---
+
+## 📖 Adding Books & Audiobooks (Online Metadata)
+
+Use the CLI helper to discover cover art, page count, genres, and word count from **Open Library**:
+
+```bash
+# 1. Add a print/e-book you are currently reading (auto-fetches cover & pages)
+python3 scripts/add_book.py "The Pragmatic Programmer" -a "Andy Hunt" --build
+
+# 2. Add an audiobook you finished (parses audio length, calculates daily pace)
+python3 scripts/add_book.py "Born a Crime" -a "Trevor Noah" -f audiobook --audio "8h 44m" -s finished --start "2025-10-01" --end "2025-10-15" -r 5.0 -n "Hilarious and deeply moving memoir." --build
+
+# 3. Dry-run to preview metadata without modifying data/books.json
+python3 scripts/add_book.py "Project Hail Mary" --dry-run
 ```
 
 ---
