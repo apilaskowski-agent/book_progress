@@ -395,12 +395,12 @@
       ],
       "cover_url": "https://covers.openlibrary.org/b/id/7883256-M.jpg",
       "notes": "System 1 intuitive thinking vs. System 2 deliberate reasoning.",
-      "duration_days": 12,
+      "duration_days": 13,
       "pace": {
         "unit": "pages/day",
-        "rate": 41.6,
+        "rate": 38.4,
         "total": 499,
-        "days": 12
+        "days": 13
       }
     }
   ],
@@ -674,12 +674,12 @@
       ],
       "cover_url": "https://covers.openlibrary.org/b/id/7883256-M.jpg",
       "notes": "System 1 intuitive thinking vs. System 2 deliberate reasoning.",
-      "duration_days": 12,
+      "duration_days": 13,
       "pace": {
         "unit": "pages/day",
-        "rate": 41.6,
+        "rate": 38.4,
         "total": 499,
-        "days": 12
+        "days": 13
       }
     }
   ],
