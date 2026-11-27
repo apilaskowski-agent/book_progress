@@ -21,11 +21,21 @@ class Book:
     end_date: Optional[str] = None
     pages: Optional[int] = None
     audio_length_minutes: Optional[int] = None
+    word_count: Optional[int] = None
     estimated_word_count: Optional[int] = None
+    language: str = "English"
     rating: Optional[float] = None
     genres: List[str] = field(default_factory=list)
     cover_url: Optional[str] = None
     notes: Optional[str] = None
+
+    def __post_init__(self):
+        if self.word_count is None and self.estimated_word_count is not None:
+            self.word_count = self.estimated_word_count
+        elif self.word_count is not None and self.estimated_word_count is None:
+            self.estimated_word_count = self.word_count
+        if not self.language:
+            self.language = "English"
 
     def validate(self):
         """Validate book data integrity."""
@@ -125,7 +135,9 @@ class Book:
             "pages": self.pages,
             "audio_length_minutes": self.audio_length_minutes,
             "audio_duration_formatted": self.audio_duration_formatted,
-            "estimated_word_count": self.estimated_word_count,
+            "word_count": self.word_count,
+            "estimated_word_count": self.word_count,
+            "language": self.language,
             "rating": self.rating,
             "genres": self.genres,
             "cover_url": self.cover_url,

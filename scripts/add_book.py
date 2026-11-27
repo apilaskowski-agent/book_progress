@@ -75,7 +75,7 @@ def fetch_open_library_metadata(title: str, author: Optional[str] = None) -> Dic
         "pages": None,
         "cover_url": None,
         "genres": [],
-        "estimated_word_count": None
+        "word_count": None
     }
 
     try:
@@ -121,8 +121,7 @@ def fetch_open_library_metadata(title: str, author: Optional[str] = None) -> Dic
                     print(f"[WARN] Failed fetching editions: {ed_err}")
 
             meta["pages"] = pages
-            if pages:
-                meta["estimated_word_count"] = int(pages * 275)
+            meta["word_count"] = None
 
     except Exception as e:
         print(f"[WARN] Open Library lookup error: {e}")
@@ -142,6 +141,10 @@ def add_or_update_book(
     rating: Optional[float] = None,
     genres: Optional[list] = None,
     notes: Optional[str] = None,
+    words: Optional[int] = None,
+    language: str = "English",
+    reread: bool = False,
+    book_id: Optional[str] = None,
     dry_run: bool = False,
     data_path: str = DATA_PATH
 ) -> Book:
@@ -154,19 +157,37 @@ def add_or_update_book(
     final_pages = pages or online["pages"]
     final_cover = online["cover_url"]
     final_genres = genres or online["genres"]
-    final_words = (final_pages * 275) if final_pages else online["estimated_word_count"]
-    book_id = slugify(final_title)
-
-    if format_type == "audiobook" and not final_pages and final_words:
-        # For audiobooks, words are still meaningful
-        pass
+    final_words = words  # Left empty/None if not explicitly provided
+    base_id = book_id or slugify(final_title)
 
     # Default start date to today if currently reading and no date provided
     if status == "reading" and not start_date:
         start_date = date.today().isoformat()
 
+    # Load existing books
+    if os.path.exists(data_path):
+        with open(data_path, "r", encoding="utf-8") as f:
+            all_books = json.load(f)
+    else:
+        all_books = []
+
+    # 2. Re-read / duplicate identification logic
+    target_id = base_id
+    matching_entries = [b for b in all_books if b.get("id") == base_id or b.get("id", "").startswith(f"{base_id}-")]
+
+    if reread:
+        target_id = f"{base_id}-{len(matching_entries) + 1}"
+        print(f"[INFO] Recording explicit re-read of '{final_title}' with ID '{target_id}'.")
+    elif matching_entries and not book_id:
+        exact = next((b for b in all_books if b.get("id") == base_id), None)
+        if exact and exact.get("status") == "finished":
+            # If the base entry is finished and this entry has different start_date or status is reading, treat as re-read
+            if (start_date and start_date != exact.get("start_date")) or status == "reading":
+                target_id = f"{base_id}-{len(matching_entries) + 1}"
+                print(f"[INFO] Previous finished read of '{final_title}' found. Auto-assigning re-read ID '{target_id}'.")
+
     book = Book(
-        id=book_id,
+        id=target_id,
         title=final_title,
         author=final_author,
         format=format_type,
@@ -175,7 +196,8 @@ def add_or_update_book(
         end_date=end_date,
         pages=final_pages if format_type == "book" else None,
         audio_length_minutes=audio_mins if format_type == "audiobook" else None,
-        estimated_word_count=final_words,
+        word_count=final_words,
+        language=language or "English",
         rating=rating,
         genres=final_genres,
         cover_url=final_cover,
@@ -189,14 +211,7 @@ def add_or_update_book(
         print(json.dumps(book.to_dict(), indent=2, ensure_ascii=False))
         return book
 
-    # Load existing books
-    if os.path.exists(data_path):
-        with open(data_path, "r", encoding="utf-8") as f:
-            all_books = json.load(f)
-    else:
-        all_books = []
-
-    # Update if ID exists, otherwise prepend
+    # Update if ID exists, otherwise append
     updated = False
     for i, b in enumerate(all_books):
         if b.get("id") == book.id:
@@ -223,11 +238,15 @@ def main():
     parser.add_argument("--status", "-s", choices=["finished", "reading", "want_to_read"], default="reading", help="Reading status")
     parser.add_argument("--pages", "-p", type=int, help="Page count (for print/ebook)")
     parser.add_argument("--audio", help="Audio duration, e.g. '16h 10m' or '970m' (for audiobook)")
+    parser.add_argument("--words", "-w", type=int, help="Exact word count (optional, left empty if omitted)")
+    parser.add_argument("--language", "-l", default="English", help="Language of book/audiobook (default: English)")
     parser.add_argument("--start", help="Start date (YYYY-MM-DD)")
     parser.add_argument("--end", help="End date (YYYY-MM-DD)")
     parser.add_argument("--rating", "-r", type=float, help="Rating (1.0 to 5.0)")
     parser.add_argument("--genres", "-g", help="Comma-separated genres")
     parser.add_argument("--notes", "-n", help="Personal takeaway or review note")
+    parser.add_argument("--reread", action="store_true", help="Explicitly record as a new re-read rather than updating an existing entry")
+    parser.add_argument("--id", help="Explicit unique book ID (override auto-generated slug)")
     parser.add_argument("--dry-run", action="store_true", help="Print record without saving")
     parser.add_argument("--build", action="store_true", help="Rebuild static site immediately")
 
@@ -248,6 +267,10 @@ def main():
         rating=args.rating,
         genres=genres_list,
         notes=args.notes,
+        words=args.words,
+        language=args.language,
+        reread=args.reread,
+        book_id=args.id,
         dry_run=args.dry_run
     )
 

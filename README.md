@@ -57,13 +57,16 @@ A clean, personal reading and audiobook tracker with interactive statistics, hos
 Use the CLI helper to discover cover art, page count, genres, and word count from **Open Library**:
 
 ```bash
-# 1. Add a print/e-book you are currently reading (auto-fetches cover & pages)
-python3 scripts/add_book.py "The Pragmatic Programmer" -a "Andy Hunt" --build
+# 1. Add a print/e-book you are currently reading (with optional exact word count and language)
+python3 scripts/add_book.py "Demon in White" -a "Christopher Ruocchio" -w 275000 -l English --build
 
 # 2. Add an audiobook you finished (parses audio length, calculates daily pace)
 python3 scripts/add_book.py "Born a Crime" -a "Trevor Noah" -f audiobook --audio "8h 44m" -s finished --start "2025-10-01" --end "2025-10-15" -r 5.0 -n "Hilarious and deeply moving memoir." --build
 
-# 3. Dry-run to preview metadata without modifying data/books.json
+# 3. Record a re-read of a book you finished previously (preserves past history)
+python3 scripts/add_book.py "Dune" --reread --start 2026-02-01 --end 2026-02-28 --build
+
+# 4. Dry-run to preview metadata without modifying data/books.json
 python3 scripts/add_book.py "Project Hail Mary" --dry-run
 ```
 

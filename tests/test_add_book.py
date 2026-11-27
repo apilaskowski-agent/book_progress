@@ -71,6 +71,72 @@ class TestAddBook(unittest.TestCase):
             self.assertEqual(saved[0]["id"], "test-book")
             self.assertEqual(saved[0]["audio_length_minutes"], 360)
             self.assertEqual(saved[0]["audio_duration_formatted"], "6h")
+            self.assertEqual(saved[0]["language"], "English")
+            self.assertIsNone(saved[0]["word_count"])
+
+    def test_explicit_words_and_empty_default(self):
+        """Verify explicit words are stored and omitted words are null."""
+        # 1. With explicit words
+        book_with_words = add_or_update_book(
+            title="Demon in White",
+            author="Christopher Ruocchio",
+            pages=760,
+            words=275000,
+            language="English",
+            dry_run=True
+        )
+        self.assertEqual(book_with_words.word_count, 275000)
+        self.assertEqual(book_with_words.language, "English")
+
+        # 2. Without words: must remain None (no page estimate heuristic)
+        book_no_words = add_or_update_book(
+            title="Empire of Silence",
+            author="Christopher Ruocchio",
+            pages=620,
+            words=None,
+            dry_run=True
+        )
+        self.assertIsNone(book_no_words.word_count)
+
+    def test_reread_and_duplicate_preservation(self):
+        """Verify re-reads create unique IDs and do not overwrite prior history."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_json = os.path.join(temp_dir, "test_books.json")
+            with open(temp_json, "w", encoding="utf-8") as f:
+                json.dump([], f)
+
+            # 1. First read of Dune in 2024
+            read1 = add_or_update_book(
+                title="Dune",
+                author="Frank Herbert",
+                pages=688,
+                status="finished",
+                start_date="2024-03-01",
+                end_date="2024-03-28",
+                data_path=temp_json
+            )
+            self.assertEqual(read1.id, "dune")
+
+            # 2. Second read (re-read) of Dune in 2026
+            read2 = add_or_update_book(
+                title="Dune",
+                author="Frank Herbert",
+                pages=688,
+                status="finished",
+                start_date="2026-01-10",
+                end_date="2026-02-05",
+                data_path=temp_json
+            )
+            self.assertEqual(read2.id, "dune-2")
+
+            # Verify both reads exist in JSON file
+            with open(temp_json, "r", encoding="utf-8") as f:
+                all_books = json.load(f)
+
+            self.assertEqual(len(all_books), 2)
+            ids = [b["id"] for b in all_books]
+            self.assertIn("dune", ids)
+            self.assertIn("dune-2", ids)
 
 
 if __name__ == "__main__":

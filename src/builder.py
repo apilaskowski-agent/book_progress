@@ -33,6 +33,7 @@ def build(output_dir: str = DOCS_DIR, data_path: str = DATA_PATH):
         "kpis": stats["kpis"],
         "yearly_stats": stats["yearly_stats"],
         "genre_counts": stats["genre_counts"],
+        "language_counts": stats["language_counts"],
         "currently_reading": stats["currently_reading"],
         "books": [b.to_dict() for b in books],
         "timeline": timeline,
