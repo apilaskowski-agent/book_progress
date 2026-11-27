@@ -51,8 +51,11 @@ class Book:
             raise ValueError(f"Book '{self.id}' status must be 'finished', 'reading', or 'want_to_read', got '{self.status}'")
 
         if self.format == "book":
-            if self.status == "finished" and (not self.pages or self.pages <= 0):
-                raise ValueError(f"Print/ebook '{self.id}' must have positive 'pages' count")
+            if self.status == "finished":
+                has_pages = self.pages is not None and self.pages > 0
+                has_words = self.word_count is not None and self.word_count > 0
+                if not has_pages and not has_words:
+                    raise ValueError(f"Print/ebook '{self.id}' must have positive 'pages' or 'word_count'")
         elif self.format == "audiobook":
             if self.status == "finished" and (not self.audio_length_minutes or self.audio_length_minutes <= 0):
                 raise ValueError(f"Audiobook '{self.id}' must have positive 'audio_length_minutes'")
@@ -91,15 +94,23 @@ class Book:
 
     @property
     def pace_per_day(self) -> Dict[str, Any]:
-        """Calculates pace (pages/day or audio minutes/day)."""
+        """Calculates pace (pages/day, words/day, or audio minutes/day)."""
         days = self.duration_days
-        if self.format == "book" and self.pages:
-            return {
-                "unit": "pages/day",
-                "rate": round(self.pages / days, 1),
-                "total": self.pages,
-                "days": days
-            }
+        if self.format == "book":
+            if self.pages:
+                return {
+                    "unit": "pages/day",
+                    "rate": round(self.pages / days, 1),
+                    "total": self.pages,
+                    "days": days
+                }
+            elif self.word_count:
+                return {
+                    "unit": "words/day",
+                    "rate": round(self.word_count / days, 1),
+                    "total": self.word_count,
+                    "days": days
+                }
         elif self.format == "audiobook" and self.audio_length_minutes:
             rate_min = round(self.audio_length_minutes / days, 1)
             return {
