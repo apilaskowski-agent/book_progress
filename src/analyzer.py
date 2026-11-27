@@ -28,7 +28,7 @@ def compute_reading_stats(books: List[Book]) -> Dict[str, Any]:
 
     total_pages = sum(b.pages for b in finished_books if b.format == "book" and b.pages)
     total_audio_mins = sum(b.audio_length_minutes for b in finished_books if b.format == "audiobook" and b.audio_length_minutes)
-    total_words = sum(b.estimated_word_count for b in finished_books if b.estimated_word_count)
+    total_words = sum(b.word_count for b in finished_books if b.word_count)
 
     # Format audio duration
     h = total_audio_mins // 60
@@ -51,6 +51,9 @@ def compute_reading_stats(books: List[Book]) -> Dict[str, Any]:
     # Genre breakdown
     genre_counts = defaultdict(int)
 
+    # Language breakdown
+    language_counts = defaultdict(int)
+
     for b in finished_books:
         end_d = b.get_end_date()
         year = end_d.year if end_d else 2024
@@ -65,12 +68,15 @@ def compute_reading_stats(books: List[Book]) -> Dict[str, Any]:
             y["audiobooks_count"] += 1
             if b.audio_length_minutes:
                 y["audio_minutes"] += b.audio_length_minutes
-        if b.estimated_word_count:
-            y["words_read"] += b.estimated_word_count
+        if b.word_count:
+            y["words_read"] += b.word_count
         y["books"].append(b.to_dict())
 
         for g in b.genres:
             genre_counts[g] += 1
+
+        lang = b.language or "English"
+        language_counts[lang] += 1
 
     # Format yearly audio hours
     for yr, y in yearly_stats.items():
@@ -83,6 +89,9 @@ def compute_reading_stats(books: List[Book]) -> Dict[str, Any]:
 
     # Genre list sorted by frequency
     sorted_genres = [{"genre": g, "count": c} for g, c in sorted(genre_counts.items(), key=lambda x: -x[1])]
+
+    # Language list sorted by frequency
+    sorted_languages = [{"language": l, "count": c} for l, c in sorted(language_counts.items(), key=lambda x: -x[1])]
 
     return {
         "kpis": {
@@ -97,6 +106,7 @@ def compute_reading_stats(books: List[Book]) -> Dict[str, Any]:
         },
         "yearly_stats": sorted_years,
         "genre_counts": sorted_genres,
+        "language_counts": sorted_languages,
         "currently_reading": [b.to_dict() for b in reading_books],
         "all_books": [b.to_dict() for b in books]
     }

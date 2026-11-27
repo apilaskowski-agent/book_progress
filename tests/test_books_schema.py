@@ -114,6 +114,45 @@ class TestBooksSchema(unittest.TestCase):
         # Audio hours should closely match ~64.3 hours
         self.assertAlmostEqual(total_monthly_audio, 64.3, delta=1.0)
 
+    def test_language_counts_and_reread_accumulation(self):
+        """Verify language breakdown and multiple reads accumulation."""
+        books = load_books(DATA_PATH)
+        stats = compute_reading_stats(books)
+
+        # Check language breakdown
+        lang_counts = stats["language_counts"]
+        self.assertGreater(len(lang_counts), 0)
+        self.assertEqual(lang_counts[0]["language"], "English")
+        self.assertEqual(lang_counts[0]["count"], 9)
+
+        # Verify duplicate / re-read aggregation logic
+        reread_dune = Book(
+            id="dune-2",
+            title="Dune",
+            author="Frank Herbert",
+            format="book",
+            status="finished",
+            start_date="2026-02-01",
+            end_date="2026-02-28",
+            pages=688,
+            word_count=188000,
+            language="English"
+        )
+        extended_books = books + [reread_dune]
+        extended_stats = compute_reading_stats(extended_books)
+
+        # Both reads are counted towards total pages (2327 + 688 = 3015)
+        self.assertEqual(extended_stats["kpis"]["total_pages_read"], 3015)
+        self.assertEqual(extended_stats["kpis"]["total_finished_books"], 10)
+        self.assertEqual(extended_stats["kpis"]["total_words_read"], 188000)
+
+        # 2026 year should now exist and contain the re-read
+        years_map = {y["year"]: y for y in extended_stats["yearly_stats"]}
+        self.assertIn(2026, years_map)
+        self.assertEqual(years_map[2026]["pages_read"], 688)
+        self.assertEqual(years_map[2026]["words_read"], 188000)
+
+
 
 if __name__ == "__main__":
     unittest.main()
