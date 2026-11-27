@@ -13,7 +13,7 @@
     "language": "English",
     "rating": 5.0,
     "genres": ["Sci-Fi", "Space", "Adventure"],
-    "cover_url": "https://covers.openlibrary.org/b/id/10522049-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/12455001-M.jpg",
     "notes": "Narrated by Ray Porter, exceptional audiobook performance and problem-solving narrative."
   },
   {
@@ -30,7 +30,7 @@
     "language": "English",
     "rating": 5.0,
     "genres": ["Self-Improvement", "Psychology"],
-    "cover_url": "https://covers.openlibrary.org/b/id/12885621-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/12886417-M.jpg",
     "notes": "Practical framework for continuous 1% marginal gains and system design over goals."
   },
   {
@@ -47,7 +47,7 @@
     "language": "English",
     "rating": 4.5,
     "genres": ["Sci-Fi", "Classic", "World-Building"],
-    "cover_url": "https://covers.openlibrary.org/b/id/12547191-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/15166231-M.jpg",
     "notes": "Incredible world-building, politics, ecology, and prescience on Arrakis."
   },
   {
@@ -64,7 +64,7 @@
     "language": "English",
     "rating": 4.0,
     "genres": ["Productivity", "Non-Fiction"],
-    "cover_url": "https://covers.openlibrary.org/b/id/8315181-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/7988607-M.jpg",
     "notes": "Focusing without distraction is becoming a superpower in the modern knowledge economy."
   },
   {
@@ -81,7 +81,7 @@
     "language": "English",
     "rating": 5.0,
     "genres": ["Computer Science", "Distributed Systems", "Engineering"],
-    "cover_url": "https://covers.openlibrary.org/b/id/8447814-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/8434671-M.jpg",
     "notes": "The definitive bible on reliability, scalability, consistency, and storage engines."
   },
   {
@@ -98,7 +98,7 @@
     "language": "English",
     "rating": 4.5,
     "genres": ["Hard Sci-Fi", "Physics", "First Contact"],
-    "cover_url": "https://covers.openlibrary.org/b/id/8231856-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/10861303-M.jpg",
     "notes": "Fascinating cosmic scale concepts, chaotic orbital mechanics, and Fermi paradox contemplation."
   },
   {
@@ -115,7 +115,7 @@
     "language": "English",
     "rating": 4.5,
     "genres": ["Biography", "Technology", "Business"],
-    "cover_url": "https://covers.openlibrary.org/b/id/6979861-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/15091624-M.jpg",
     "notes": "Unvarnished portrait of passion, design obsession, reality distortion field, and flaws."
   },
   {
@@ -132,7 +132,7 @@
     "language": "English",
     "rating": 4.0,
     "genres": ["Literary Sci-Fi", "Artificial Intelligence"],
-    "cover_url": "https://covers.openlibrary.org/b/id/10574763-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/10673548-M.jpg",
     "notes": "Tender, melancholic examination of what it means to love through an Artificial Friend's eyes."
   },
   {
@@ -149,7 +149,7 @@
     "language": "English",
     "rating": 4.5,
     "genres": ["History", "Anthropology", "Non-Fiction"],
-    "cover_url": "https://covers.openlibrary.org/b/id/8370162-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/8594920-M.jpg",
     "notes": "The power of shared fictions and myths that allowed mass human cooperation."
   },
   {
@@ -166,7 +166,7 @@
     "language": "English",
     "rating": null,
     "genres": ["Psychology", "Cognitive Science", "Behavioral Economics"],
-    "cover_url": "https://covers.openlibrary.org/b/id/7883256-M.jpg",
+    "cover_url": "https://covers.openlibrary.org/b/id/7889800-M.jpg",
     "notes": "System 1 intuitive thinking vs. System 2 deliberate reasoning."
   }
 ]

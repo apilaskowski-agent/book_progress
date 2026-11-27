@@ -86,7 +86,20 @@ def fetch_open_library_metadata(title: str, author: Optional[str] = None) -> Dic
                 print("[WARN] No match found on Open Library.")
                 return meta
 
-            doc = docs[0]
+            # Filter out summary pamphlets / study guides to ensure true book match
+            filtered_docs = [
+                d for d in docs 
+                if not any(sw in d.get("title", "").lower() for sw in ["summary of", "summary :", "study guide", "analysis of", "workbook", "macat"])
+            ]
+            candidates = filtered_docs if filtered_docs else docs
+
+            # Prioritize exact title match with valid cover image
+            doc = candidates[0]
+            for c in candidates:
+                if c.get("cover_i") and c.get("title", "").lower().strip() == title.lower().strip():
+                    doc = c
+                    break
+
             meta["title"] = doc.get("title", title)
             authors = doc.get("author_name", [])
             if authors:
