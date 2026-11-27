@@ -6,6 +6,7 @@ Compiles data and prepares the docs/ directory for GitHub Pages.
 import json
 import os
 import shutil
+from datetime import datetime, timezone
 from .analyzer import (
     load_books,
     compute_reading_stats,
@@ -29,6 +30,9 @@ def build(output_dir: str = DOCS_DIR, data_path: str = DATA_PATH):
     timeline = compute_daily_reading_spread(books)
     monthly_stats = compute_monthly_reading_spread(timeline, books)
 
+    now_utc = datetime.now(timezone.utc)
+    generated_at_str = now_utc.strftime("%Y-%m-%d %H:%M UTC")
+
     payload = {
         "kpis": stats["kpis"],
         "yearly_stats": stats["yearly_stats"],
@@ -38,7 +42,8 @@ def build(output_dir: str = DOCS_DIR, data_path: str = DATA_PATH):
         "books": [b.to_dict() for b in books],
         "timeline": timeline,
         "monthly_stats": monthly_stats,
-        "built_at": "2026-11-26T01:30:00Z"
+        "generated_at": generated_at_str,
+        "built_at": now_utc.isoformat()
     }
 
     # 2. Write data.json into docs
